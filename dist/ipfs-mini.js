@@ -13,41 +13,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// identity function for calling harmory imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-
+/******/
 /******/ 	// define getter function for harmory exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		Object.defineProperty(exports, name, {
@@ -56,13 +56,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			get: getter
 /******/ 		});
 /******/ 	};
-
+/******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
@@ -83,7 +83,7 @@ module.exports = XMLHttpRequest;
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+"use strict";
 
 var XMLHttpRequest = __webpack_require__(0);
 
@@ -110,17 +110,18 @@ function IPFS(provider) {
  * @throws if the provider object is not an object
  */
 IPFS.prototype.setProvider = function setProvider(provider) {
-  if (typeof provider !== 'object') {
-    throw new Error('[ifpsjs] provider must be type Object, got \'' + typeof provider + '\'.');
+  if (typeof provider !== "object") {
+    throw new Error("[ifpsjs] provider must be type Object, got '" + typeof provider + "'.");
   }
   var self = this;
   var data = self.provider = Object.assign({
-    host: '127.0.0.1',
+    host: "127.0.0.1",
     pinning: true,
-    port: '5001',
-    protocol: 'http',
-    base: '/api/v0' }, provider || {});
-  self.requestBase = String(data.protocol + '://' + data.host + ':' + data.port + data.base);
+    port: "5001",
+    protocol: "http",
+    base: "/api/v0"
+  }, provider || {});
+  self.requestBase = String(data.protocol + "://" + data.host + ":" + data.port + data.base);
 };
 
 /**
@@ -138,31 +139,31 @@ IPFS.prototype.sendAsync = function sendAsync(opts, cb) {
   request.onreadystatechange = function () {
     if (request.readyState === 4 && request.timeout !== 1) {
       if (request.status !== 200) {
-        callback(new Error('[ipfs-mini] status ' + request.status + ': ' + request.responseText), null);
+        callback(new Error("[ipfs-mini] status " + request.status + ": " + request.responseText), null);
       } else {
         try {
           callback(null, options.jsonParse ? JSON.parse(request.responseText) : request.responseText);
         } catch (jsonError) {
-          callback(new Error('[ipfs-mini] while parsing data: \'' + String(request.responseText) + '\', error: ' + String(jsonError) + ' with provider: \'' + self.requestBase + '\'', null));
+          callback(new Error("[ipfs-mini] while parsing data: '" + String(request.responseText) + "', error: " + String(jsonError) + " with provider: '" + self.requestBase + "'", null));
         }
       }
     }
   };
 
-  var pinningURI = self.provider.pinning && opts.uri === '/add' ? '?pin=true' : '';
+  var pinningURI = self.provider.pinning && opts.uri === "/add" ? "?pin=true" : "";
 
   if (options.payload) {
-    request.open('POST', '' + self.requestBase + opts.uri + pinningURI);
+    request.open("POST", "" + self.requestBase + opts.uri + pinningURI);
   } else {
-    request.open('GET', '' + self.requestBase + opts.uri + pinningURI);
+    request.open("GET", "" + self.requestBase + opts.uri + pinningURI);
   }
 
   if (options.accept) {
-    request.setRequestHeader('accept', options.accept);
+    request.setRequestHeader("accept", options.accept);
   }
 
   if (options.payload && options.boundary) {
-    request.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + options.boundary);
+    request.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + options.boundary);
     request.send(options.payload);
   } else {
     request.send();
@@ -174,7 +175,7 @@ IPFS.prototype.sendAsync = function sendAsync(opts, cb) {
  */
 function createBoundary(data) {
   while (true) {
-    var boundary = '----IPFSMini' + Math.random() * 100000 + '.' + Math.random() * 100000;
+    var boundary = "----IPFSMini" + Math.random() * 100000 + "." + Math.random() * 100000;
     if (data.indexOf(boundary) === -1) {
       return boundary;
     }
@@ -188,18 +189,47 @@ function createBoundary(data) {
  * @callback {String} `ipfsHash` returns an IPFS hash string
  */
 IPFS.prototype.add = function addData(input, callback) {
-  var data = typeof input === 'object' && input.isBuffer ? input.toString('binary') : input;
+  var data = typeof input === "object" && input.isBuffer ? input.toString("binary") : input;
   var boundary = createBoundary(data);
-  var payload = '--' + boundary + '\r\nContent-Disposition: form-data; name="path"\r\nContent-Type: application/octet-stream\r\n\r\n' + data + '\r\n--' + boundary + '--';
+  var payload = "--" + boundary + "\r\nContent-Disposition: form-data; name=\"path\"\r\nContent-Type: application/octet-stream\r\n\r\n" + data + "\r\n--" + boundary + "--";
 
   var addCallback = function addCallback(err, result) {
     return callback(err, !err ? result.Hash : null);
   };
   this.sendAsync({
     jsonParse: true,
-    accept: 'application/json',
-    uri: '/add',
-    payload: payload, boundary: boundary
+    accept: "application/json",
+    uri: "/add",
+    payload: payload,
+    boundary: boundary
+  }, addCallback);
+};
+
+/**
+ * Add an string or buffer to IPFS
+ * @param {String|Buffer} `input` a single string or buffer
+ * @param {String} `path` a string
+ * @param {Function} `callback` a callback, with (error, ipfsHash String)
+ * @callback {String} `ipfsHash` returns an IPFS hash string
+ */
+IPFS.prototype.addWithPath = function addData(input, path, callback) {
+  var data = typeof input === "object" && input.isBuffer ? input.toString("binary") : input;
+  var boundary = createBoundary(data);
+  var contentType = "application/octet-stream";
+  path.replace(/\.(png|jpg|jpeg|gif)$/, function (match, ext) {
+    contentType = "image/" + ext;
+  });
+  var payload = "--" + boundary + "\r\nContent-Disposition: form-data; name=" + path + "\r\nContent-Type: " + contentType + "\r\n\r\n" + data + "\r\n--" + boundary + "--";
+
+  var addCallback = function addCallback(err, result) {
+    return callback(err, !err ? result.Hash : null);
+  };
+  this.sendAsync({
+    jsonParse: true,
+    accept: "application/json",
+    uri: "/add",
+    payload: payload,
+    boundary: boundary
   }, addCallback);
 };
 
@@ -222,7 +252,7 @@ IPFS.prototype.addJSON = function addJson(jsonData, callback) {
  */
 IPFS.prototype.stat = function cat(ipfsHash, callback) {
   var self = this;
-  self.sendAsync({ jsonParse: true, uri: '/object/stat/' + ipfsHash }, callback);
+  self.sendAsync({ jsonParse: true, uri: "/object/stat/" + ipfsHash }, callback);
 };
 
 /**
@@ -233,7 +263,7 @@ IPFS.prototype.stat = function cat(ipfsHash, callback) {
  */
 IPFS.prototype.cat = function cat(ipfsHash, callback) {
   var self = this;
-  self.sendAsync({ uri: '/cat/' + ipfsHash }, callback);
+  self.sendAsync({ uri: "/cat/" + ipfsHash }, callback);
 };
 
 /**
